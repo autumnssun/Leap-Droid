@@ -12,15 +12,21 @@
  2/Jan/2014 ADDED function
  *the rotor is armed and set to a certain speed before it can be controlled
  *by the server
+ 9/Jan/2014 - ADDED function
+ *Timer: for better auto flight control
 */
  
 #include<Servo.h>
+#include <Event.h>
+#include <Timer.h>
+#include <Time.h>
 
 // Declare some global variables
 String stack;
 boolean stacking;
 int index;
 boolean greenLight=false;
+int const stableSpeed=90;
 
 //those are the rotor pin,
 const int p_1 = 6, p_2 = 7, p_3 = 8, p_4 = 9; //pin 9
@@ -32,10 +38,9 @@ int r1_his_val=0, r2_his_val=0, r3_his_val=0, r4_his_val=0;// store the value of
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   setup_rotors();
 }
-
 
 void loop() {
   if(greenLight){
@@ -50,60 +55,33 @@ void setup_rotors(){
   rotor3.attach(p_3);
   rotor4.attach(p_4);
   
-   // Arm all 4 esc at once
+   /* Arm all 4 esc at once
+  * ARMING PROCESS FOR SKYWALER 20C
+  * After armed start the rotor
+  */
+  
   int speed;
   for(speed = 0; speed <= 100; speed+= 1){
-    setRotorSpeed(speed,rotor1);
-    setRotorSpeed(speed,rotor2);
-    setRotorSpeed(speed,rotor3);
-    setRotorSpeed(speed,rotor4);
+    setVariableSpeed(speed);
     delay(5);
   }
   delay(2000);  
   for(speed = 100; speed >0; speed -=1){
-    //updateSpeed(speed);
-    setRotorSpeed(speed,rotor1);
-    setRotorSpeed(speed,rotor2);
-    setRotorSpeed(speed,rotor3);
-    setRotorSpeed(speed,rotor4);
+    setVariableSpeed(speed);
     delay(5); 
   }
   delay(2000);
   
-  /* ARMING PROCESS FOR SKYWALER 20C
-  * After armed start the rotor
-  */
-  
-  setRotorSpeed(30,rotor1);
-  setRotorSpeed(30,rotor2);
-  setRotorSpeed(30,rotor3);
-  setRotorSpeed(30,rotor4);
-    
-  
+  setStableSpeed();
   Serial.println("{A}");
   greenLight=true;
-//  if(Serial.available()>0&&!greenLight){
-//    String confirm=Serial.readString();
-//    Serial.println(confirm);
-//    if (confirm=="{B}"){
-//      Serial.println("Greenlight is on");
-//      greenLight=true;
-//    }
-//  }
 }
 
-void setRotorSpeed(int speed,Servo rot){
-  // speed is from 0 to 100 where 0 is off and 100 is max speed
-  // the following maps speed values of 0-100 to angles from 0-180
-  //Serial.write("speed=");
-  //Serial.println(speed);
-  rot.write(speed);
-}
+
 
 //package listener is called by the main loop
 void packageListener(){
   if (Serial.available()>0){
-    //Serial.println(Serial.readString());
     char val=Serial.read();
     String chr=String(val);
     if (chr=="{"){
@@ -115,21 +93,20 @@ void packageListener(){
       stack.replace(" ","");
       index=0;
       r4_val=stack.toInt();
-      Serial.println(r1_val);
-      Serial.println(r2_val);
-      Serial.println(r3_val);
-      Serial.println(r4_val);
+      //this is for deaying
+      long unixTime = now();
+      Serial.println(r4_val-unixTime);
+      
       Serial.flush();
+      setRotorSpeed();
+      prt();
     }else
    
-    
     if (stacking){
       if (chr==","){
        index++;
-       //Serial.println(index);
        switch (index) {
           case 1:
-            //do something when var equals 1
             r1_val=stack.toInt();
             break;
           case 2:
@@ -143,6 +120,41 @@ void packageListener(){
         stack+=chr; //read the character and add it in the stack  
       }
     }
+  }else{
+    
   }  
 }
 
+void reader(){
+}
+
+void prt(){
+  Serial.println(r1_val);
+  Serial.println(r2_val);
+  Serial.println(r3_val);
+  Serial.println(r4_val);
+}
+
+void setVariableSpeed(int sp){
+  rotor1.write(sp);
+  rotor2.write(sp);
+  rotor3.write(sp);
+  rotor4.write(sp);
+}
+void setRotorSpeed(){
+  rotor1.write(r1_val);
+  rotor2.write(r2_val);
+  rotor3.write(r3_val);
+  rotor4.write(r4_val);
+  r1_his_val=r1_val;
+  r2_his_val=r2_val;
+  r3_his_val=r3_val;
+  r4_his_val=r4_val;
+}
+void setStableSpeed(){
+  rotor1.write(stableSpeed);
+  rotor2.write(stableSpeed);
+  rotor3.write(stableSpeed);
+  rotor4.write(stableSpeed);
+  r1_his_val=r2_his_val=r3_his_val=r4_his_val=stableSpeed;
+}
