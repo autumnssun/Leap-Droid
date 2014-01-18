@@ -24,6 +24,9 @@
 import com.onformative.leap.LeapMotionP5;
 import com.leapmotion.leap.*;
 import processing.serial.*;
+import saito.objloader.*;
+
+OBJModel model;
 
 LeapMotionP5 leap;
 Serial port;// Serial port of the xbee object.
@@ -44,22 +47,41 @@ final boolean relativeToLeap=false;
 
 final  PVector pitchEffectiveRange=new PVector(0,0),
                rollEffectiveRange=new PVector(0,0);
+float rotX, rotY;
                
 public void setup() {
   size(1400, 700,P3D);// set up the window with P3D mode
   leap = new LeapMotionP5(this);
   port = new Serial(this,"/dev/tty.usbserial-A101LY3X", 115200);
+  background(255);
+  
+  model = new OBJModel(this, "object.obj", "absolute", QUADS);
+  model.enableDebug();
+  
+  model.scale(1);
+  model.translateToCenter();
+  model.disableTexture();
+  stroke(255);
+  noStroke();
+}
+
+
+void mouseDragged(){
+    rotX += (mouseX - pmouseX) * 0.01;
+    rotY -= (mouseY - pmouseY) * 0.01;
 }
 
 public void draw() {
-  rx();
   background(255);
+  rx();  
+  
   if(leap.getHandList().size()>0 && leap.getFingerList().size()>3){
     if (handInitiated){
         if (timeup()>0){
           float [] arr=sandBox(leap.getHand(0));
           prt(arr);          
-          drawQuadcopter(arr);
+          //drawQuadcopter(arr);
+          //draw3d();
           tx(arr);
         }else{
           saveOriginalHand(leap.getHand(0));
@@ -117,12 +139,14 @@ public float[] sandBox(Hand h){
     r2=r4=pivot;
   }
   
-  fill(0, 0, 200);
-  text("Yawn (angle): "+yaw*PI/180,10,300);
-  fill(0, 200, 0);
-  text("Ptich (angle): "+pitch*PI/180,10,360);
-  fill(200, 0, 0);
-  text("Roll (angle): "+roll*PI/180,10,420);
+  lights();
+  pushMatrix();
+  translate(width/2,height/2);
+  rotateX(radians(map(pitch, -30, 30, 45, -45)));
+  rotateY(radians(map(yaw, -12, 18, 45, -45)));
+  rotateZ(radians(map(roll, -40, 40, 45, -45)));
+  model.draw();
+  popMatrix();
   
   returnArray[0]=r1;
   returnArray[1]=r2;
@@ -169,6 +193,10 @@ public void drawQuadcopter(float []ar){
   stroke(0);
   line(x-80,ar[2],x+80,ar[0]);
   line(x-150,ar[1],x+150,ar[3]);
+  
+  
+  
+  
 }
 
 public void prt(float []ar){
@@ -176,6 +204,13 @@ public void prt(float []ar){
   for (int i=0; i<4;i++){
     text("Rotor " +(i+1)+" value: "+ (int)ar[i], 10, 30*(i+1));
   }
+  fill(0, 0, 200);
+  text("Yawn (angle): "+ar[4]*PI/180,10,300);
+  fill(0, 200, 0);
+  text("Ptich (angle): "+ar[5]*PI/180,10,360);
+  fill(200, 0, 0);
+  text("Roll (angle): "+ar[6]*PI/180,10,420);
+  
 }
 
 public void tx(float []ar ){
