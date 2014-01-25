@@ -1,5 +1,5 @@
-#include <Wire.h>
-#include <L3G4200D.h>
+#include "Wire.h"
+#include "L3G4200D.h"
 
 L3G4200D gyro;
 

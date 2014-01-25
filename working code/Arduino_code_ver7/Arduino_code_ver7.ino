@@ -19,6 +19,7 @@
  24/Jan/2014 
  Problem: ESC not armed properply.... 
  trying to port from the example to make thing works beter.
+ try arming each motor seperately might help.
 */
  
 #include <Servo.h>
@@ -31,7 +32,7 @@ boolean handPresented=false,
 
 int const stableSpeed=80;
 Servo motor[4];
-int const pins[4]={3,5,7,9};
+int const pins[4]={3,5,7,8};
 int speeds[4];
 
 int commaIndex;
@@ -42,9 +43,8 @@ void setup() {
 }
 
 void loop() {
-//  Serial.println("Hello leap");
-//  delay(3000);
-//  rx();
+  rx();
+  setRotorSpeed();
 //  prt();
 //  if (autoPilotOn){
 //    autoPilot();
@@ -52,7 +52,6 @@ void loop() {
 //    setRotorSpeed();
 //  }
 
-  swipe();
 }
 
 //package listener is called by the main loop
@@ -68,6 +67,8 @@ void rx(){
       stacking=false;
       speeds[3]=stack.toInt();
       commaIndex=0;
+      //print out the result
+      prt();
       break;
     }else{
       if (chr==','){
@@ -107,40 +108,21 @@ void land(){
 
 
 void setup_rotors(){  
-  
   for (int i=0;i<4;i++){
     motor[i].attach(pins[i]);
   }
-  
-  //arming code port form arm_demo
   for (int i=0;i<4;i++){
-    speeds[i]=50;
-  } 
-  setRotorSpeed();
-  delay(1000);
-  
-  for (int i=0;i<4;i++){
-    speeds[i]=179;
+    speeds[i]=30;
   }
   setRotorSpeed();
+  delay(2000);
   
-// int speed;
-//  for(speed = 0; speed <= 180; speed+= 1){
-//    for (int i=0;i<4;i++){
-//      speeds[i]=speed;
-//    }
-//    setRotorSpeed();
-//    delay(50);
-//  }
-//  delay(2000);  
-//  for(speed = 180; speed > 0; speed -=1){
-//    for (int i=0;i<4;i++){speeds[i]=speed;}
-//    setRotorSpeed();
-//    delay(); 
-//  }
-//  delay(2000);
-//  for (int i=0;i<4;i++){speeds[i]=stableSpeed;}
-//  setRotorSpeed();
+  /*
+  //after that swipe 2 time
+  for (int i=0;i<2;i++){
+    swipe();
+  }
+  */
 }
 
 void prt(){
@@ -163,7 +145,8 @@ void setRotorSpeed(){
 
 
 void swipe(){
-  for(int v = 50; v < 180; v+= 1){
+  prt();
+  for(int v = 50; v < 90; v+= 1){
     for (int i=0;i<4;i++){
       speeds[i]=v;
     }

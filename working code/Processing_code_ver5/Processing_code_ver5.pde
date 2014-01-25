@@ -38,12 +38,12 @@ PVector originalHandPosition;
 int startTime=millis();
 final int radius = 10;
 final int lowSpeed=40,   //Lowest speed for the rotor
-          highSpeed=170, //Highest speed for the rotor
+          highSpeed=180, //Highest speed for the rotor
           lowAlt=40,    //Lowest position of the hand in mm
           highAlt=350;   //Highest positionof the hand in mm
 final float axisSensitivity=5; 
 final int waitTime=2000;
-final boolean relativeToLeap=false;
+final boolean relativeToLeap=true;
 
 final  PVector pitchEffectiveRange=new PVector(0,0),
                rollEffectiveRange=new PVector(0,0);
@@ -56,12 +56,10 @@ public void setup() {
   background(255);
   
   model = new OBJModel(this, "object.obj", "absolute", QUADS);
-  model.enableDebug();
   
   model.scale(1);
   model.translateToCenter();
   model.disableTexture();
-  stroke(255);
   noStroke();
 }
 
@@ -158,7 +156,7 @@ public float[] sandBox(Hand h){
   returnArray[6]=yaw;
   
   for (int i=0; i<4;i++){
-    float cache=map(returnArray[i],lowAlt,highAlt,highSpeed,lowSpeed);
+    float cache=map(returnArray[i],highAlt,lowAlt,lowSpeed,highSpeed);
   }
   
   return returnArray;

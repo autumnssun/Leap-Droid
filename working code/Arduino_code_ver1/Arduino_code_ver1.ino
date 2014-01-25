@@ -34,8 +34,8 @@ XBee xbee = XBee();
 
 void setup() {
   Serial.begin(9600);
-  //setup_rotors();
-  //arms_escs();
+  setup_rotors();
+  arms_escs();
 }
 
 
