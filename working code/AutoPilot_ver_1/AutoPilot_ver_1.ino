@@ -12,7 +12,7 @@ ADXL345 acc;
 void setup()
 {
   acc.begin();
-  Serial.begin(9600);
+  Serial.begin(115200);
   delay(100);
 }
 

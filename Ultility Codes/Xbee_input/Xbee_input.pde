@@ -79,5 +79,6 @@ void senddata(String srt){
   stack[0]=typedText;
   port.write(typedText);
   typedText="{";
+  port.clear();
   println(srt);  
 }

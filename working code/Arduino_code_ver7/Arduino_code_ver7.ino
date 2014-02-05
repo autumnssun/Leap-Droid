@@ -30,7 +30,8 @@ boolean handPresented=false,
         greenLight=false,
         autoPilotOn=true;
 
-int const stableSpeed=80;
+int const stableSpeed=70,
+          compensation=2;
 Servo motor[4];
 int const pins[4]={3,5,7,8};
 int speeds[4];
@@ -44,13 +45,13 @@ void setup() {
 
 void loop() {
   rx();
-  setRotorSpeed();
-//  prt();
-//  if (autoPilotOn){
-//    autoPilot();
-//  }else{
-//    setRotorSpeed();
-//  }
+  //setRotorSpeed();
+  //prt();
+  if (autoPilotOn){
+    autoPilot();
+  }else{
+    setRotorSpeed();
+  }
 
 }
 
@@ -99,7 +100,11 @@ void rx(){
 }
 
 void autoPilot(){
-  Serial.println("auto piloting");
+   Serial.println("auto");
+  for (int i=0;i<4;i++){
+    speeds[i]=stableSpeed;
+  }
+  setRotorSpeed();
 }
 
 void land(){
@@ -116,13 +121,6 @@ void setup_rotors(){
   }
   setRotorSpeed();
   delay(2000);
-  
-  /*
-  //after that swipe 2 time
-  for (int i=0;i<2;i++){
-    swipe();
-  }
-  */
 }
 
 void prt(){
@@ -139,8 +137,13 @@ void prt(){
 void setRotorSpeed(){
   //speeds array contains 4 values each should range from 30-179
   for (int i=0;i<4;i++){
-    motor[i].write(speeds[i]);
+    if(i==3){
+      motor[i].write(speeds[i]-compensation);
+    }else{
+      motor[i].write(speeds[i]);
+    }
   }
+  prt();
 }
 
 

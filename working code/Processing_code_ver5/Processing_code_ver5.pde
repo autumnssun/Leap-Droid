@@ -32,6 +32,7 @@ LeapMotionP5 leap;
 Serial port;// Serial port of the xbee object.
 
 boolean handInitiated=false;
+
 int [] speeds= new int[4];
 float orgPitch, orgYaw, orgRoll;
 PVector originalHandPosition;
@@ -41,10 +42,13 @@ final int lowSpeed=40,   //Lowest speed for the rotor
           highSpeed=180, //Highest speed for the rotor
           lowAlt=40,    //Lowest position of the hand in mm
           highAlt=350;   //Highest positionof the hand in mm
-final float axisSensitivity=5; 
+final float axisSensitivity=5,
+            handSensitivity=-4;
+            
 final int waitTime=2000;
-final boolean relativeToLeap=true;
-
+final boolean relativeToLeap=false,
+              heightControlOnly =false;
+      
 final  PVector pitchEffectiveRange=new PVector(0,0),
                rollEffectiveRange=new PVector(0,0);
 float rotX, rotY;
@@ -78,8 +82,7 @@ public void draw() {
         if (timeup()>0){
           float [] arr=sandBox(leap.getHand(0));
           prt(arr);          
-          //drawQuadcopter(arr);
-          //draw3d();
+          
           tx(arr);
         }else{
           saveOriginalHand(leap.getHand(0));
@@ -89,7 +92,6 @@ public void draw() {
           text("Gain control in " +(-timeup()+1000)/1000  + " seconds",10,30);
         }
     }else{
-      //port.write("{LeapReady}");
       startTime=millis();
       handInitiated=true;
     }
@@ -116,36 +118,31 @@ public float[] sandBox(Hand h){
   
   if (!relativeToLeap){
      handPos=PVector.sub(handPos,originalHandPosition);
-     pitch=(pitch-orgPitch);
-     roll =(roll-orgRoll);
-     yaw = (yaw-orgYaw);
+     pitch=-(pitch-orgPitch);
+     roll =-(roll-orgRoll);
+     yaw = -(yaw-orgYaw);
   }
-  float handHeight=handPos.y;
+  float handHeight=handPos.y/handSensitivity+100;
   float pivot=handHeight;
-  
-  if(pitchEffectiveRange.x<pitch||pitch<pitchEffectiveRange.y){
-    r1=pivot+sin(pitch*PI/180)*radius*axisSensitivity;
-    r3=pivot-sin(pitch*PI/180)*radius*axisSensitivity;
+  if (!heightControlOnly){
+    if(pitchEffectiveRange.x<pitch||pitch<pitchEffectiveRange.y){
+      r1=pivot+sin(pitch*PI/180)*radius*axisSensitivity;
+      r3=pivot-sin(pitch*PI/180)*radius*axisSensitivity;
+    }else{
+      r1=r3=pivot;
+    }
+    
+    if(rollEffectiveRange.x<roll||roll<rollEffectiveRange.y){
+      r2=pivot+sin(roll*PI/180)*radius*axisSensitivity;
+      r4=pivot-sin(roll*PI/180)*radius*axisSensitivity;
+    }else{
+      r2=r4=pivot;
+    }
   }else{
-    r1=r3=pivot;
+    r1=r2=r3=r4=pivot;
   }
   
-  if(rollEffectiveRange.x<roll||roll<rollEffectiveRange.y){
-    r2=pivot+sin(roll*PI/180)*radius*axisSensitivity;
-    r4=pivot-sin(roll*PI/180)*radius*axisSensitivity;
-  }else{
-    r2=r4=pivot;
-  }
-  
-  lights();
-  pushMatrix();
-  translate(width/2,height/2);
-  rotateX(radians(map(pitch, -30, 30, 45, -45)));
-  rotateY(radians(map(yaw, -12, 18, 45, -45)));
-  rotateZ(radians(map(roll, -40, 40, 45, -45)));
-  model.draw();
-  popMatrix();
-  
+  println(pivot);
   returnArray[0]=r1;
   returnArray[1]=r2;
   returnArray[2]=r3;
@@ -158,7 +155,7 @@ public float[] sandBox(Hand h){
   for (int i=0; i<4;i++){
     float cache=map(returnArray[i],highAlt,lowAlt,lowSpeed,highSpeed);
   }
-  
+  drawQuadcopter(returnArray);
   return returnArray;
 }
 
@@ -182,19 +179,14 @@ public void rx(){
 
 
 public void drawQuadcopter(float []ar){
-  fill(0);
-  float x=leap.getPosition(leap.getHand(0)).x;
-  ellipse(x-80,ar[2],20,20);
-  ellipse(x+80,ar[0],60,60);
-  ellipse(x-150,ar[1],40,40);
-  ellipse(x+150,ar[3],40,40);
-  stroke(0);
-  line(x-80,ar[2],x+80,ar[0]);
-  line(x-150,ar[1],x+150,ar[3]);
-  
-  
-  
-  
+  lights();
+  pushMatrix();
+  translate(width/2,height/2);
+  rotateX(radians(map(ar[4], -30, 30, 45, -45)));
+  rotateY(radians(map(ar[5], -12, 18, 45, -45)));
+  rotateZ(radians(map(ar[6], -40, 40, 45, -45)));
+  model.draw();
+  popMatrix();
 }
 
 public void prt(float []ar){
