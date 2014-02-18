@@ -31,10 +31,14 @@ boolean handPresented=false,
         autoPilotOn=true;
 
 int const stableSpeed=70,
-          compensation=2;
+          compensation=1,
+          lowLimit=29,
+          highLimit=140;
+          
 Servo motor[4];
 int const pins[4]={3,5,7,8};
 int speeds[4];
+
 
 int commaIndex;
 
@@ -45,8 +49,6 @@ void setup() {
 
 void loop() {
   rx();
-  //setRotorSpeed();
-  //prt();
   if (autoPilotOn){
     autoPilot();
   }else{
@@ -100,7 +102,9 @@ void rx(){
 }
 
 void autoPilot(){
-   Serial.println("auto");
+  Serial.println("auto");
+  //for now just set the speed to stable speed,
+  //TODO: adding auto balancing code using input from the sensor.
   for (int i=0;i<4;i++){
     speeds[i]=stableSpeed;
   }
@@ -120,7 +124,8 @@ void setup_rotors(){
     speeds[i]=30;
   }
   setRotorSpeed();
-  delay(2000);
+  delay(2000); 
+  
 }
 
 void prt(){
@@ -137,23 +142,13 @@ void prt(){
 void setRotorSpeed(){
   //speeds array contains 4 values each should range from 30-179
   for (int i=0;i<4;i++){
-    if(i==3){
-      motor[i].write(speeds[i]-compensation);
-    }else{
-      motor[i].write(speeds[i]);
+    if (speeds[i]>lowLimit&& speeds[i]<highLimit){
+      if(i==3){
+        motor[i].write(speeds[i]-compensation);
+      }else{
+        motor[i].write(speeds[i]);
+      }
     }
   }
   prt();
-}
-
-
-void swipe(){
-  prt();
-  for(int v = 50; v < 90; v+= 1){
-    for (int i=0;i<4;i++){
-      speeds[i]=v;
-    }
-    setRotorSpeed();
-    delay(50);
-  }
 }
