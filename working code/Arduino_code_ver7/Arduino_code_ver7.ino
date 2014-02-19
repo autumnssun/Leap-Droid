@@ -116,17 +116,7 @@ void land(){
 }
 
 
-void setup_rotors(){  
-  for (int i=0;i<4;i++){
-    motor[i].attach(pins[i]);
-  }
-  for (int i=0;i<4;i++){
-    speeds[i]=30;
-  }
-  setRotorSpeed();
-  delay(2000); 
-  
-}
+
 
 void prt(){
   Serial.print(speeds[0]);
