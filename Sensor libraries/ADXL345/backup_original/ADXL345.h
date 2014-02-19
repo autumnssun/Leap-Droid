@@ -60,13 +60,6 @@ class ADXL345
 		int writeRegister(byte reg_addr, int nbytes, byte *buffer);
 	
 	public:
-	
-		typedef struct vector
-		{
-			float x, y, z;
-		} vector;
-		vector g;
-		
 		enum range_t
 		{
 			RANGE_16G = 0x0B,
@@ -74,12 +67,12 @@ class ADXL345
 			RANGE_4G  = 0x09,
 			RANGE_2G  = 0x08
 		};
-		ADXL345();	
+
+		ADXL345();
+	
 		void begin();
 		void end();
-		void enableDefault();
-		void read();
-		
+	
 		//G Reading
 		void read(double *x, double *y, double *z);
 	

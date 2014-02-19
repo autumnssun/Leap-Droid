@@ -12,7 +12,6 @@
 #include <ADXL345.h>
 #include <Wire.h>
 
-
 int ADXL345::writeRegister(byte reg_addr, int nbytes, byte *buffer)
 {
 	int written_bytes;
@@ -58,28 +57,10 @@ void ADXL345::begin()
 	writeRegister(ADXL345::POWER_CTL, 1, &data);
 }
 
-void ADXL345::enableDefault()
-{
-	byte data = 0x08;
-	writeRegister(ADXL345::POWER_CTL, 1, &data);
-}
-
-
 void ADXL345::end()
 {
 	byte data = 0x00;
 	writeRegister(ADXL345::POWER_CTL, 1, &data);
-}
-
-void ADXL345::read()
-{
-	byte buffer[6];
-
-	readRegister(ADXL345::DATAX0, 6, buffer);
-	
-	g.x = ((buffer[0] + (buffer[1] << 8)) - zG[0])/256.0;
-	g.y = ((buffer[2] + (buffer[3] << 8)) - zG[1])/256.0;
-	g.z = ((buffer[4] + (buffer[5] << 8)) - zG[2])/256.0;
 }
 
 void ADXL345::read(double *x, double *y, double *z)

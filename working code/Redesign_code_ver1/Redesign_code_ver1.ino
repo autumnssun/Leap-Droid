@@ -3,16 +3,18 @@
 // and monitor the sensor reading
 // Basicaly the idea is try to alter the sensor reading to the
 // balace reading.
+
+// TRY TO INTEGRATING QUADCOPTER LIBARY. 
 #include <Wire.h>
 #include <Servo.h>
 #include <ADXL345.h>
 #include <L3G4200D.h>// Gyrocopter library
 #include <HMC5883.h> // Compass library
 
+
 ADXL345 accel;
 L3G4200D gyro;
 HMC5883 compass;
-
 // Declare some global variables
 String stack;
 boolean handPresented=false,
@@ -28,13 +30,14 @@ int const stableSpeed=70,
 Servo motor[4];
 int const pins[4]={3,5,7,8};
 int speeds[4];
+//
 double accel_x,accel_y,accel_z;
 int commaIndex;
 
 void setup(){
   Serial.begin(115200);
   Wire.begin();
-  
+  //quad.setupQuadcopter();
   accel.enableDefault();
   gyro.enableDefault();
   compass.enableDefault();
@@ -53,13 +56,14 @@ void loop(){
   gyro.read();
   compass.read();
   accel.read();
+  
   //
   if(stable()){
   }else{
     //make change to motor accordingly
   }
 }
-
+//
 void rx(){
   while (Serial.available()){
     char chr=(char) Serial.read();
@@ -89,12 +93,13 @@ void rx(){
         if(chr=='L'){land();}
         else{
           autoPilotOn=false;
-          stack+=chr; /*read the character and add it in the stack*/
+          stack+=chr; //read the character and add it in the stack
         }
       }
     }
   }
 }
+
 
 void setup_rotors(){  
   for (int i=0;i<4;i++){
@@ -114,7 +119,7 @@ void setRotorSpeed(){
     }
   }
 }
-
+//
 void land(){
   Serial.println("Landing");
 }

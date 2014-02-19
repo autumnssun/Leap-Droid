@@ -1,1 +1,0 @@
-// HCM5883: Digital compass
