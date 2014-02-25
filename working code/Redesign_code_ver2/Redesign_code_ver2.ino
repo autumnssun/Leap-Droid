@@ -7,50 +7,25 @@
 // TRY TO INTEGRATING QUADCOPTER LIBARY. 
 #include <Wire.h>
 #include <Servo.h>
-#include <ADXL345.h>
-#include <L3G4200D.h>// Gyrocopter library
-#include <HMC5883.h> // Compass library
-#include <QUADCOPTER.h>
+#include <ADXL345.h>   // Accelerometer library
+#include <L3G4200D.h>  // Gyrocopter library
+#include <HMC5883.h>   // Compass library
+#include <QUADCOPTER.h>//My quadcopter library
 
 ADXL345 accel;
 L3G4200D gyro;
 HMC5883 compass;
 QUADCOPTER quad;
+float fXg,fYg,fZg,alpha=.5;
 // Declare some global variables
-String stack;
-boolean handPresented=false,
-        stacking=false,
-        greenLight=false,
-        autoPilotOn=true;
-
-int const stableSpeed=70,
-          compensation=1,
-          lowLimit=29,
-          highLimit=140;
-          
-Servo motor[4];
-int const pins[4]={3,5,7,8};
-int speeds[4];
-//
-double accel_x,accel_y,accel_z;
-int commaIndex;
-
 void setup(){
   Serial.begin(115200);
   Wire.begin();
+  
   quad.setupQuadcopter();
   accel.enableDefault();
   gyro.enableDefault();
   compass.enableDefault();
-  
-  //Serial.println("Count,G_X,G_Y,G_Z,A_X,A_Y,A_Z,C_X,C_Y,C_Z");
-   //TODO
-   // setup the quadcopter arm motor
-   // setup all the sensors
-}
-
-boolean stable(){
-  return true;
 }
 
 void loop(){
@@ -58,6 +33,39 @@ void loop(){
   compass.read();
   accel.read();
   quad.readSerial();
+  //printDebug('a');
+  printJsonPitchYawn();
+  //Serial.println();
+}
+void printJsonPitchYawn (){
+    double pitch, roll;
+    
+    fXg = accel.g.x * alpha + (fXg * (1.0 - alpha));
+    fYg = accel.g.y * alpha + (fYg * (1.0 - alpha));
+    fZg = accel.g.z * alpha + (fZg * (1.0 - alpha));
+    
+    Serial.print("{\"pitch\":");
+    Serial.print(fXg);
+    Serial.print(",\"yaw\":");
+    Serial.print(fYg);
+    Serial.print(",\"roll\":");
+    Serial.print(fZg);
+    Serial.println("}");
+    
+    //Roll and Pitch Equations
+//    roll  = (atan2(-fYg, fZg)*180.0)/M_PI;
+//    pitch = (atan2(fXg, sqrt(fYg*fYg + fZg*fZg))*180.0)/M_PI;
+    
+//    Serial.print("{\"pitch\":");
+//    Serial.print(pitch);
+//    Serial.print(",\"roll\":");
+//    Serial.print(roll);
+//    Serial.println("}");
+    
+//    Serial.print(pitch);
+//    Serial.print(":");
+//    Serial.println(roll);
+    delay(10);
 }
 
 void land(){
@@ -79,4 +87,27 @@ void accending(float height){
 void decending(float height){
 }
 
+
+void printDebug(char type){
+  double x,y,z;
+  if (type=='a'){
+     x=accel.g.x;
+     y=accel.g.y;
+     z=accel.g.z;
+  }else if(type=='g'){
+     x=gyro.g.x;
+     y=gyro.g.y;
+     z=gyro.g.z;
+  }else{
+     x=compass.g.x;
+     y=compass.g.y;
+     z=compass.g.z;
+  }
+    Serial.print(x);
+    Serial.print(",");
+    Serial.print(y);
+    Serial.print(",");
+    Serial.print(z);
+    Serial.print(",");
+}
 

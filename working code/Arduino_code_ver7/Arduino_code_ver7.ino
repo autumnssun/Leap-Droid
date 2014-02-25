@@ -116,6 +116,13 @@ void land(){
 }
 
 
+void setup_rotors(){  
+  for (int i=0;i<4;i++){
+    motor[i].attach(pins[i]);
+    motor[i].write(30);
+  }
+  delay(2000);   
+}
 
 
 void prt(){
@@ -133,11 +140,7 @@ void setRotorSpeed(){
   //speeds array contains 4 values each should range from 30-179
   for (int i=0;i<4;i++){
     if (speeds[i]>lowLimit&& speeds[i]<highLimit){
-      if(i==3){
-        motor[i].write(speeds[i]-compensation);
-      }else{
-        motor[i].write(speeds[i]);
-      }
+      (i==3)?(motor[i].write(speeds[i]-compensation)):(motor[i].write(speeds[i]));
     }
   }
   prt();
