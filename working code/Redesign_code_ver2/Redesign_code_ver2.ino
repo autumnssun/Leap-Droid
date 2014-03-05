@@ -29,7 +29,7 @@ void setup(){
   //compass.enableDefault();
   //gyro.enableDefault();
   quad.setupQuadcopter();
-  quad.setRotorSpeed(a);
+  //quad.setRotorSpeed(a);
 }
 
 void loop(){

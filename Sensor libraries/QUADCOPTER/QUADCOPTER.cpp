@@ -3,43 +3,71 @@
 #include "Wire.h"
 #include "Servo.h"
 #include "string.h"
+
+const int a = 3;             
+const int b = 5;              
+const int c = 7;
+const int d = 8;
+
 QUADCOPTER::QUADCOPTER()
 {
-	handPresented=false, 
-	stacking=false,
-	greenLight=false,
-	autoPilotOn=true,
-	
-	stableSpeed=70,
-	lowLimit=29, 
-	highLimit=140,
-	
-	compensation=0.4;
-	static const int pins[4]={3,5,7,8};
-	double speeds[4]={0,0,0,0};
+	    handPresented=false, 
+		stacking=false,
+		greenLight=false,
+		autoPilotOn=true;
+	    stableSpeed=70,
+		lowLimit=29, 
+		highLimit=140,
+		compensation=0.4;
+		
 }
 
 void QUADCOPTER::setupQuadcopter(void)
-{
-	Serial.println("Seting up quadcopter");
-	for (int i=0; i<4;i++)
-	{
-		motors[i].attach(pins[i]);
-		speeds[i]=30;
-		Serial.println(i);
+{	
+	int servoPins[SERVOS]={a,b,c,d};
+	
+	for (int i=0; i<SERVOS;i++){	
+		//For some reason every time we want to write the speed, 
+		//you need to attache the servo to the pin
+		motors[i].attach(servoPins[i]);		
+		motors[i].write(30);
+  	  
+	  Serial.print("speed of motor [");
+  	  Serial.print(i);
+  	  Serial.print("]= ");
+  	  Serial.println(motors[i].read());
+  	  motors[i].write(speeds[i]);
+	  
 	}
-	setRotorSpeed();
+	delay(2000);
+	Serial.println("________________________");
+	//takeOff();
+	
 }
 
 void QUADCOPTER::setRotorSpeed()
+{	
+	//const int servoPins[SERVOS]={3,5,7,8};
+	
+}
+
+void QUADCOPTER::setRotorSpeed(int a[])
 {
-	for (int i=0;i<4;i++)
-	{
-		if (speeds[i]>lowLimit&& speeds[i]<highLimit)
-		{
-			(i==3)?(motors[i].write(speeds[i]-compensation)):(motors[i].write(speeds[i]));
-		}
+	int servoPins[SERVOS]={a,b,c,d};
+	
+	for (int i=0;i<SERVOS;i++){
+		motors[i].attach(servoPins[i]);
+		Serial.print("Change motor [");
+		Serial.print(i);
+		Serial.print("] on pin ");
+		Serial.print(servoPins[i]);
+		Serial.print(" from ");
+		Serial.print(motors[i].read());
+		Serial.print(" to ");
+    	motors[i].write(a[i]);	
+		Serial.println(motors[i].read());
   	}
+	delay(10);
 }
 
 void QUADCOPTER::readSerial()
@@ -73,7 +101,6 @@ void QUADCOPTER::readSerial()
         if(chr=='L'){land();}
         else{
           autoPilotOn=false;
-          Serial.print ("Char Val: ");
           stack=appendCharToCharArray(stack,chr);
           
           //read the character and add it in the stack
@@ -102,8 +129,18 @@ void QUADCOPTER::yawn(float angle){
 void QUADCOPTER::roll(float andle){
 }
 
-void QUADCOPTER::takeOff(){
+void QUADCOPTER::takeOff(void){
+	for (int i=0; i<SERVOS;i++){	
+		motors[i].attach(servoPins[i]);
+		motors[i].write(70);
+	}
 }
 
 void QUADCOPTER::land(){
+}
+
+void QUADCOPTER::accending(float andle){
+}
+
+void QUADCOPTER::decending(float andle){
 }
