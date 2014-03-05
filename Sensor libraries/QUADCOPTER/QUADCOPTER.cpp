@@ -21,10 +21,12 @@ QUADCOPTER::QUADCOPTER()
 
 void QUADCOPTER::setupQuadcopter(void)
 {
+	Serial.println("Seting up quadcopter");
 	for (int i=0; i<4;i++)
 	{
 		motors[i].attach(pins[i]);
 		speeds[i]=30;
+		Serial.println(i);
 	}
 	setRotorSpeed();
 }

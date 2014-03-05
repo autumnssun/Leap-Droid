@@ -3,9 +3,10 @@
 // and monitor the sensor readings
 // Basicaly the idea is try to alter the sensor reading to the
 // balace reading.
-
-#include <Wire.h>
+// modify the motor array and put it back to the main 
+// arduino class
 #include <Servo.h>
+#include <Wire.h>
 #include <ADXL345.h>   // Accelerometer library
 #include <L3G4200D.h>  // Gyrocopter library
 #include <HMC5883.h>   // Compass library
@@ -17,28 +18,25 @@
 ADXL345 accel;
 HMC5883 compass;
 QUADCOPTER quad;
-float fXg,fYg,fZg,alpha=0.7;
+float fXg,fYg,fZg,alpha=0.5;
 int a[]={123,330,120,140};
 void setup(){
   Serial.begin(115200);
-  Wire.begin();
   
   /*Start up all the sensor before the motors*/
   
-  //accel.enableDefault();
+  accel.enableDefault();
   //compass.enableDefault();
   //gyro.enableDefault();
-  quad.setupQuadcopter();
-  quad.setRotorSpeed(a);
 }
 
 void loop(){
   //gyro.read();
   //compass.read();
-  //accel.read();
+  accel.read();
+  printDebug('a');
   //printJsonPitchYawn();
   //quad.readSerial();
-  //quad.motors[3].write(70);
 }
 void printJsonPitchYawn (){
     double pitch, roll, yaw;

@@ -14,9 +14,11 @@
 // Turns on the L3G4200D's gyro and places it in normal mode.
 void L3G4200D::enableDefault(void)
 {
-	// 0x0F = 0b00001111
+	// 0x0F = 0b 0000 1111
+	// 0x60 = 0b 0110 0000
 	// Normal power mode, all axes enabled
 	writeReg(L3G4200D_CTRL_REG1, 0x0F);
+	writeReg()L3G4200D_FIFO_CTRL_REG,0x20);//enable the FIFO mode
 }
 
 // Writes a gyro register
