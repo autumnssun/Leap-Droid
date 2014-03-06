@@ -43,7 +43,7 @@
 int servoCount=4;
 Servo motors[4];
 int const pins[4]={3,5,7,8};
-double spd[4]={30,30,30,30};
+double spd[4]={50,50,50,50};
 
 L3G4200D gyro;
 ADXL345 accel;
@@ -53,9 +53,7 @@ float fXg,fYg,fZg,alpha=0.5;
 void setup(){
   Serial.begin(115200);
   Wire.begin();
-  setupDroid();
-  
-  
+  //setupDroid();
   /*Start up all the sensor before the motors*/
   accel.enableDefault();
   compass.enableDefault();
@@ -71,8 +69,7 @@ void loop(){
   //Print out variables for debug
   //printDebug('a');
   //printDebug('g');
-  printJsonPitchYawn();
-  
+  //printJsonPitchYawn();
   Serial.println();
 }
 
@@ -83,16 +80,11 @@ void setupDroid(){
     motors[i].write(30);
   }
   delay(2000);
-  takeOff();
+  setRotorSpeed(spd);
 }
-void takeOff(){
-  double cache[4]={60,60,60,60};
-  setRotorSpeed(cache);
-}
+
 void setRotorSpeed(double spds[4] ){
-  for (int i=0;i<4;i++){
-      motors[i].write(spds[i]);
-  }
+  for (int i=0;i<4;i++){ motors[i].write(spds[i]);}
 }
 
 void printJsonPitchYawn (){
