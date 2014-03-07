@@ -33,6 +33,7 @@
 
 #include <Servo.h>
 #include <Wire.h>
+
 //Sensors libraries.
 #include <ADXL345.h>   // Accelerometer library
 #include <L3G4200D.h>  // Gyrocopter library
@@ -40,41 +41,45 @@
 
 #include <QUADCOPTER.h>//My quadcopter library
 #include <math.h>
-int servoCount=4;
+
+//Quadcopters related variables.
 Servo motors[4];
 int const pins[4]={3,5,7,8};
 double spd[4]={50,50,50,50};
-
+//Sensors variable each sensor has a vector (x,y,z) g variable that store the reading
+//TODO consolidate the sensors reading
 L3G4200D gyro;
 ADXL345 accel;
 HMC5883 compass;
 
+// configuration parameters
 float fXg,fYg,fZg,alpha=0.5;
+
 void setup(){
   Serial.begin(115200);
   Wire.begin();
-  //setupDroid();
-  /*Start up all the sensor before the motors*/
-  accel.enableDefault();
-  compass.enableDefault();
-  gyro.enableDefault();
+  
+   /*Start up all the sensor before the motors*/
+  setupSensors();
+  //setupBalance();
+  setupDroid();
 }
+
+
 
 void loop(){
-  //Reads sensors informations
-  gyro.read();
-  compass.read();
-  accel.read();
+  // PID Contorl loop
+  // read the control from the serial (leapmotion control) 
+  // then read the sensors. apply PID Control 
+  // compute the motors values, and set the speeds
   
-  //Print out variables for debug
-  //printDebug('a');
-  //printDebug('g');
-  //printJsonPitchYawn();
+  readSensors();
+  printDebug('u');
+  //setRotorSpeed(spd);
   Serial.println();
 }
-
+//setup functions 
 void setupDroid(){
-  
   for (int i=0;i<4;i++){
     motors[i].attach(pins[i]);
     motors[i].write(30);
@@ -83,10 +88,29 @@ void setupDroid(){
   setRotorSpeed(spd);
 }
 
+void setupSensors(){
+//  accel.enableDefault();
+//  accel.read();
+//  accel.setZeroG(accel.g.x,accel.g.y,accel.g.z);
+  
+  gyro.enableDefault();
+  
+  compass.enableDefault();
+}
+
+//Readfunctions
+void readSensors(){
+  gyro.read();
+  //accel.read();
+  compass.read();
+}
+
 void setRotorSpeed(double spds[4] ){
   for (int i=0;i<4;i++){ motors[i].write(spds[i]);}
 }
 
+
+//debug funntions
 void printJsonPitchYawn (){
     double pitch, roll, yaw;
     fXg = accel.g.x * alpha + (fXg * (1.0 - alpha));
@@ -105,8 +129,6 @@ void printJsonPitchYawn (){
     
     delay(10);
 }
-
-
 void printDebug(char type){
   double x,y,z;
   if (type=='a'){
@@ -129,23 +151,3 @@ void printDebug(char type){
     Serial.print(z);
     Serial.print(",");
 }
-
-void land(){
-  Serial.println("Landing");
-}
-
-void pitch (float angle){
-}
-
-void roll (float angle){
-}
-
-void yawn (float angle){
-}
-
-void accending(float height){
-}
-
-void decending(float height){
-}
-
