@@ -2,31 +2,15 @@
 #include <Wire.h>
 
 IMU imu;
+boolean debug=true;
+float alphaFillter=0.5;
 
 void setup(){
   Serial.begin(115200);
   Wire.begin();
-  imu.start();
+  imu.start(debug,alphaFillter);
 }
 
 void loop(){
-  imu.read();
-  Serial.print(imu.gyro.x);
-  Serial.print(',');
-  Serial.print(imu.gyro.y);
-  Serial.print(',');
-  Serial.print(imu.gyro.z);
-  Serial.print(',');
-  Serial.print(imu.accel.x);
-  Serial.print(',');
-  Serial.print(imu.accel.y);
-  Serial.print(',');
-  Serial.print(imu.accel.z);
-  Serial.print(',');
-  Serial.print(imu.magn.x);
-  Serial.print(',');
-  Serial.print(imu.magn.y);
-  Serial.print(',');
-  Serial.print(imu.magn.z);
-  Serial.println(',');
+  imu.readsensors();
 }

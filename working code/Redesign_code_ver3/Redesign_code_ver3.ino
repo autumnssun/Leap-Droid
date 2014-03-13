@@ -74,7 +74,7 @@ void loop(){
   // compute the motors values, and set the speeds
   
   readSensors();
-  printDebug('u');
+  printDebug('g');
   //setRotorSpeed(spd);
   Serial.println();
 }
