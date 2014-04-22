@@ -62,7 +62,7 @@ void setup(){
    /*Start up all the sensor before the motors*/
   setupSensors();
   //setupBalance();
-  setupDroid();
+  //setupDroid();
 }
 
 
@@ -102,7 +102,7 @@ void setupSensors(){
 void readSensors(){
   gyro.read();
   //accel.read();
-  compass.read();
+  //compass.read();
 }
 
 void setRotorSpeed(double spds[4] ){
@@ -144,10 +144,5 @@ void printDebug(char type){
      y=compass.g.y;
      z=compass.g.z;
   }
-    Serial.print(x);
-    Serial.print(",");
-    Serial.print(y);
-    Serial.print(",");
-    Serial.print(z);
-    Serial.print(",");
 }
+
