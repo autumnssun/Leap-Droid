@@ -21,8 +21,8 @@
  *droid, that mean it will control the speed of 4 rotors
 */
 
-import com.onformative.leap.LeapMotionP5;
-import com.leapmotion.leap.*;
+//import com.onformative.leap.LeapMotionP5;
+import com.leapmotion.leap.LeapMotionP5;
 import processing.serial.*;
 import saito.objloader.*;
 
